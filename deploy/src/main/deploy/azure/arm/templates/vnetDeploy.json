@@ -60,7 +60,10 @@
                 "[parameters('vnetName')]"
             ],
             "properties": {
-                "addressPrefix": "[parameters('aksSubnetPrefix')]"
+                "addressPrefix": "[parameters('aksSubnetPrefix')]",
+                "serviceEndpoints": [{
+                    "service": "Microsoft.ServiceBus"
+                }]
             }
         }]
     }]

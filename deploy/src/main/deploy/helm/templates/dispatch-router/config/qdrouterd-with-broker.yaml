@@ -66,28 +66,48 @@
   ["connector", {
     "sslProfile": "external",
     "name": "broker",
-    "host": "{{ .Release.Name }}-artemis",
     "port": 5671,
     "role": "route-container",
+{{- if .Values.azure.serviceBus.enabled }}
+    "host": {{ .Values.azure.serviceBus.host | quote }},
+    "idleTimeoutSeconds": 120,
+    "saslMechanisms": "PLAIN",
+    "saslUsername": {{ .Values.azure.serviceBus.saslUsername | quote }},
+    "saslPassword": {{ .Values.azure.serviceBus.saslPassword | quote }},
+    "verifyHostname": true
+{{ else }}
+    "host": "{{ .Release.Name }}-artemis",
     "saslUsername": "artemis",
     "saslPassword": "artemis",
     "verifyHostname": false
+{{ end }}
   }],
 
   ["linkRoute", {
     "prefix": "event/",
     "direction": "in",
+{{- if .Values.azure.serviceBus.enabled }}
+    "delExternalPrefix": "event/",
+{{ end }}
     "connection": "broker"
   }],
 
   ["linkRoute", {
     "prefix": "event/",
     "direction": "out",
+{{- if .Values.azure.serviceBus.enabled }}
+    "delExternalPrefix": "event/",
+{{ end }}
     "connection": "broker"
   }],
 
   ["address", {
     "prefix": "telemetry/",
+    "distribution": "balanced"
+  }],
+
+  ["address", {
+    "prefix": "event/",
     "distribution": "balanced"
   }],
 

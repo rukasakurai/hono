@@ -3,10 +3,10 @@
 # Declare variables to be passed into your templates.
 
 # amqpMessagingNetworkDeployExample indicates whether the example AMQP Messaging Network
-# consisting of a single Dispatch Router and Artemis broker should be
+# consisting of a single Dispatch Router and Artemis broker (or Azure ServiceBus) should be
 # deployed and used.
 amqpMessagingNetworkDeployExample: true
-# dispatchRouterImageName contains the name (including tag)
+# dispatchRouter.imageName contains the name (including tag)
 # of the container image to use for the example AQMP Messaging Network
 dispatchRouter:
   imageName: ${dispatch-router.image.name}
@@ -17,6 +17,14 @@ dispatchRouter:
 # image to use for the example AMQP Messaging network
 artemisImageName: ${artemis.image.name}
 
+# Azure related configurations
+azure:
+# Azure ServiceBus as alternative to self-hosted Artemis ActiveMQ for event persistence
+  serviceBus:
+    enabled: false
+    saslUsername:
+    saslPassword:
+    host:
 
 # deviceRegistryDeployExample indicates whether the example Device Registry
 # should be deployed and used.

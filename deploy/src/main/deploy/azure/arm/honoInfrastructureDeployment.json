@@ -131,10 +131,30 @@
                 "description": "The Service Principal Client Secret."
             },
             "type": "securestring"
+        },
+        "namespaceName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Optional ServiceBus namespace name. Otherwise calculated from uniqueSolutionPrefix."
+            }
+        },
+        "serviceBusSku": {
+            "type": "string",
+            "allowedValues": [
+                "Basic",
+                "Standard",
+                "Premium"
+            ],
+            "defaultValue": "Standard",
+            "metadata": {
+                "description": "The messaging tier for service Bus namespace"
+            }
         }
 
     },
     "variables": {
+        "namespaceName": "[if(empty(parameters('namespaceName')),concat(parameters('uniqueSolutionPrefix'),'honons'),parameters('namespaceName'))]",
         "mqttDnsLabelPrefix": "[if(empty(parameters('mqttDnsLabelPrefix')),concat(parameters('uniqueSolutionPrefix'),'-hono-mqtt'),parameters('mqttDnsLabelPrefix'))]",
         "httpDnsLabelPrefix": "[if(empty(parameters('httpDnsLabelPrefix')),concat(parameters('uniqueSolutionPrefix'),'-hono-http'),parameters('httpDnsLabelPrefix'))]",
         "amqpDnsLabelPrefix": "[if(empty(parameters('amqpDnsLabelPrefix')),concat(parameters('uniqueSolutionPrefix'),'-hono-amqp'),parameters('amqpDnsLabelPrefix'))]",
@@ -160,7 +180,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/kaizimmerm/hono/azure/cloud/azure/arm/templates/kubernetesDeploy.json"
+                    "uri": "https://raw.githubusercontent.com/kaizimmerm/hono/azure/deploy/src/main/deploy/azure/arm/templates/kubernetesDeploy.json"
                 },
                 "parameters": {
                     "clusterName": {
@@ -222,6 +242,39 @@
                     }
                 }
             }
+        }, {
+            "name": "honoServiceBusDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'honoVnetDeployment')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/kaizimmerm/hono/azure/deploy/src/main/deploy/azure/arm/templates/serviceBusDeploy.json"
+                },
+                "parameters": {
+                    "serviceBusNamespaceName": {
+                        "value": "[variables('namespaceName')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "serviceBusSku": {
+                        "value": "[parameters('serviceBusSku')]"
+                    },
+                    "virtualNetworkName": {
+                        "value": "[variables('vnetName')]"
+                    },
+                    "subnetName": {
+                        "value": "[variables('aksSubnetName')]"
+                    },
+                    "virtualNetworkResourceGroup": {
+                        "value": "[resourceGroup().name]"
+                    }
+                }
+            }
         },
         {
             "name": "honoVnetDeployment",
@@ -230,7 +283,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/kaizimmerm/hono/azure/cloud/azure/arm/templates/vnetDeploy.json"
+                    "uri": "https://raw.githubusercontent.com/kaizimmerm/hono/azure/deploy/src/main/deploy/azure/arm/templates/vnetDeploy.json"
                 },
                 "parameters": {
                     "vnetName": {
@@ -294,6 +347,19 @@
         "networkPublicIPFQDN": {
             "type": "string",
             "value": "[reference('honoKubernetesDeployment').outputs.networkIpFQDN.value]"
+        },
+        "serviceBusKey": {
+            "type": "string",
+            "value": "[reference('honoServiceBusDeployment').outputs.DefaultSharedAccessPolicyPrimaryKey.value]"
+        },
+        "serviceBusKeyName": {
+            "type": "string",
+            "value": "[reference('honoServiceBusDeployment').outputs.DefaultSharedAccessPolicyKeyName.value]"
+        },
+        "serviceBusNamespaceName": {
+            "type": "string",
+            "value": "[variables('namespaceName')]"
         }
+
     }
 }
