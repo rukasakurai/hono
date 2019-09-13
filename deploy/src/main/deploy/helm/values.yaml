@@ -8,7 +8,11 @@
 amqpMessagingNetworkDeployExample: true
 # dispatchRouterImageName contains the name (including tag)
 # of the container image to use for the example AQMP Messaging Network
-dispatchRouterImageName: ${dispatch-router.image.name}
+dispatchRouter:
+  imageName: ${dispatch-router.image.name}
+  svc:
+    annotations: {}
+    loadBalancerIP:
 # artemisImageName contains the name (including tag) of the container
 # image to use for the example AMQP Messaging network
 artemisImageName: ${artemis.image.name}
@@ -23,6 +27,9 @@ deviceRegistry:
   # Set to false to not override registry files with example content
   resetFiles: true
   imageName: ${docker.repository}/hono-service-device-registry:${project.version}
+  svc:
+    annotations: {}
+    loadBalancerIP:
 
 
 # dataGridDeployExample indicates whether the example data grid
@@ -109,6 +116,9 @@ adapters:
   #deviceConnectionSpec:
   #deviceRegistrationSpec:
   #tenantSpec:
+    svc:
+      annotations: {}
+      loadBalancerIP:
 
   coap:
     # enabled indicates if Hono's (experimental) CoAP adapter should be deployed.
@@ -117,17 +127,29 @@ adapters:
     enabled: false
     # Docker image repository
     imageName: ${docker.repository}/hono-adapter-coap-vertx:${project.version}
+    svc:
+      annotations: {}
+      loadBalancerIP:
   http:
     # Docker image repository
     imageName: ${docker.repository}/hono-adapter-http-vertx:${project.version}
+    svc:
+      annotations: {}
+      loadBalancerIP:
   mqtt:
     # Docker image repository
     imageName: ${docker.repository}/hono-adapter-mqtt-vertx:${project.version}
+    svc:
+      annotations: {}
+      loadBalancerIP:
   kura:
     # enabled indicates if Hono's (deprecated) Kura adapter should be deployed.
     enabled: false
     # Docker image repository
     imageName: ${docker.repository}/hono-adapter-kura:${project.version}
+    svc:
+      annotations: {}
+      loadBalancerIP:
   # Configures a timeout for inactive sender links.
   # Please refer to the Spring Boot documentation for the supported syntax:
   # https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html#boot-features-external-config-conversion-duration
@@ -136,6 +158,8 @@ adapters:
 deviceConnectionService:
   # Docker image repository
   imageName: ${docker.repository}/hono-service-device-connection:${project.version}
+  svc:
+    annotations: {}
 
   # enabled indicates if the data grid based Device Connection service implementation
   # should be deployed and used. If set to false (the default), the example implementation
