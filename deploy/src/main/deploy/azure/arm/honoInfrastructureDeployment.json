@@ -249,40 +249,6 @@
                     }
                 }
             }
-        }, {
-            "condition": "[parameters('serviceBus')]",
-            "name": "honoServiceBusDeployment",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2018-05-01",
-            "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'honoVnetDeployment')]"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/eclipse/hono/master/deploy/src/main/deploy/azure/arm/templates/serviceBusDeploy.json"
-                },
-                "parameters": {
-                    "serviceBusNamespaceName": {
-                        "value": "[variables('namespaceName')]"
-                    },
-                    "location": {
-                        "value": "[parameters('location')]"
-                    },
-                    "serviceBusSku": {
-                        "value": "[parameters('serviceBusSku')]"
-                    },
-                    "virtualNetworkName": {
-                        "value": "[variables('vnetName')]"
-                    },
-                    "subnetName": {
-                        "value": "[variables('aksSubnetName')]"
-                    },
-                    "virtualNetworkResourceGroup": {
-                        "value": "[resourceGroup().name]"
-                    }
-                }
-            }
         },
         {
             "name": "honoVnetDeployment",
@@ -355,18 +321,6 @@
         "networkPublicIPFQDN": {
             "type": "string",
             "value": "[reference('honoKubernetesDeployment').outputs.networkIpFQDN.value]"
-        },
-        "serviceBusKey": {
-            "type": "string",
-            "value": "[reference('honoServiceBusDeployment').outputs.DefaultSharedAccessPolicyPrimaryKey.value]"
-        },
-        "serviceBusKeyName": {
-            "type": "string",
-            "value": "[reference('honoServiceBusDeployment').outputs.DefaultSharedAccessPolicyKeyName.value]"
-        },
-        "serviceBusNamespaceName": {
-            "type": "string",
-            "value": "[variables('namespaceName')]"
         }
 
     }
